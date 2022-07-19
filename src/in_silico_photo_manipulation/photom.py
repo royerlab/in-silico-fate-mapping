@@ -44,7 +44,28 @@ class PhotoM:
         n_samples: int = 25,
         bind_to_existing: bool = True,
     ) -> None:
-        """TODO"""
+        """
+        Simulates a photo manipulation experiment from a set of tracks by interpolating coordinates at each time step.
+
+        Parameters
+        ----------
+        data : Optional[Union[pd.DataFrame, np.ndarray]], optional
+            Dataframe with columns TrackID, t, (z), y, x or 2-dim array with length 4 or 5 on 1-axis
+        radius : float, optional
+            Interpolation neighboord radius
+        reverse : bool, optional
+            Indicates reverse time step direction
+        sigma : float, optional
+            Additive gaussian noise sigma
+        weights : str, optional
+            Interpolation weighting strategy, by default "distance"
+        heatmap : bool, optional
+            Accumulate the tracks frequency into a heatmap, by default False
+        n_samples : int, optional
+            Number of samples per individual coordinate, by default 25
+        bind_to_existing : bool, optional
+            Binds sample to existing data point at starting time, by default True
+        """
         self._base_colnames = ["TrackID", "t", "y", "x"]
         self._spatial_columns = ["y", "x"]
         self.reverse = reverse
@@ -284,7 +305,6 @@ class PhotoM:
             neighbors = nn.kneighbors(
                 current[:, 1:], return_distance=False
             ).reshape(-1)
-            neighbors = np.unique(neighbors)
             samples.append(X[neighbors])
         return np.concatenate(samples, axis=0, dtype=float)
 
