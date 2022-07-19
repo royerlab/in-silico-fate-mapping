@@ -26,7 +26,6 @@ def update_fit(method):
     def wrapper(self, *args, **kwargs):
         if not self._fitted:
             self._fit()
-            self._fitted = True
         return method(self, *args, **kwargs)
 
     return wrapper
@@ -135,10 +134,11 @@ class PhotoM:
         return self._weights
 
     @weights.setter
-    @outdate_fit
     def weights(self, value: str) -> None:
         """Neighborhood weighting for interpolation (knn regression)"""
         self._weights = value
+        for model in self._models.values():
+            model.weights = value
 
     @property
     def radius(self) -> float:
@@ -162,8 +162,11 @@ class PhotoM:
 
     def _fit(self) -> None:
         """Fits a model for each time point"""
+        if self._data is None:
+            raise ValueError("Data must be set before executing PhotoM")
+
         self._models = {
-            t: self._fit_model(t, **self._kwargs)
+            t: self._fit_model(t)
             for t in tqdm(self.time_iter(), "Fitting interpolation")
         }
         self._fitted = True
@@ -190,7 +193,7 @@ class PhotoM:
             values = conn_df[self._spatial_columns].values
             X = values[::2]
             Y = values[1::2]
-            if self.reversed:
+            if self.reverse:
                 X, Y = Y, X
         else:
             X, Y = None, None
@@ -229,7 +232,7 @@ class PhotoM:
 
     def time_iter(self, t0: Optional[int] = None) -> Iterable[int]:
         """Time step iterable, starting at `t0`"""
-        if t0 < self._tmin or t0 > self._tmax:
+        if t0 is not None and (t0 < self._tmin or t0 > self._tmax):
             raise ValueError(
                 f"time point out of models range {(self._tmin, self._tmax)}"
             )
@@ -245,12 +248,12 @@ class PhotoM:
 
     def _compute_heatmap(self, paths: np.ndarray) -> zarr.Array:
         """Accumulates frequency of `path` hits"""
-        shape = np.ceil(paths[2:].max(axis=0)).astype(int) + 1
+        shape = np.ceil(paths[:, 1:].max(axis=0)).astype(int) + 1
         heatmap = zarr.zeros(
             shape=shape,
             dtype=np.int32,
             store=zarr.MemoryStore(),
-            chunks=(1,) + len(shape) * (64,),
+            chunks=(1,) + (len(shape) - 1) * (64,),
         )
         df = self._validate_data(paths)
         for t, group in tqdm(df.groupby("t"), "Computing heatmap"):
@@ -260,7 +263,8 @@ class PhotoM:
                 self._spatial_columns, as_index=False
             ).sum()
             heatmap.vindex[
-                (int(round(t)),) + tuple(df[self._spatial_columns].values.T)
+                (int(round(t)),)
+                + tuple(coords[self._spatial_columns].values.T)
             ] = coords["w"]
         return heatmap
 
@@ -314,7 +318,7 @@ class PhotoM:
         if self.bind_to_existing:
             coords = self._knn_sampling(coords)
         else:
-            coords = np.repeat(coords, repeats=self._n_samples_w.value, axis=0)
+            coords = np.repeat(coords, repeats=self.n_samples, axis=0)
         return coords
 
     @update_fit
@@ -345,7 +349,7 @@ class PhotoM:
             )
 
         t0 = source[0, 0]
-        if np.all(source[:, 0] == t0):
+        if np.any(source[:, 0] != t0):
             raise ValueError("All sources must belong to the same time point")
 
         source = self._sample_sources(source)
@@ -357,13 +361,14 @@ class PhotoM:
 
         paths = [self._as_track(t0, pos)]
         for t in tqdm(self.time_iter(t0=int(round(t0))), "Computing paths"):
-            valid = self._valid_rows[pos]
-            X = (pos + _noise)[valid]
+            valid = self._valid_rows(pos)
+            X = (pos + _noise())[valid]
             if len(X) == 0:
                 break
             pos[valid] = self._models[t].predict(X)
             paths.append(self._as_track(t + self.step, pos))
 
         paths = np.concatenate(paths, axis=0)
+        paths = paths[np.lexsort((paths[:, 1], paths[:, 0]))]
 
         return self._compute_heatmap(paths) if self.heatmap else paths
