@@ -49,6 +49,7 @@ class PhotoMWidget(Container):
             label="n. samples",
             value=25,
             tooltip="number of samples at each starting point",
+            max=10000,
         )
         self.append(self._n_samples_w)
 
@@ -151,10 +152,15 @@ class PhotoMWidget(Container):
 
         if self._heatmap_w.value:
             self._viewer.add_image(
-                result, colormap="magma", blending="additive"
+                result,
+                colormap="magma",
+                blending="additive",
+                name="PhotoM Heatmap",
             )
         else:
-            self._viewer.add_tracks(result, colormap="hvs")
+            self._viewer.add_tracks(
+                result, colormap="hsv", name="PhotoM Tracks"
+            )
 
     def _on_clear_points(self) -> None:
         if self._points_layer_w.value is None:
