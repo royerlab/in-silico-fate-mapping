@@ -222,7 +222,9 @@ class PhotoM:
 
         # build regression model
         return RadiusNeighborsRegressor(
-            radius=self.radius, weights=self.weights
+            radius=self.radius,
+            weights=self.weights,
+            n_jobs=8,
         ).fit(X, Y)
 
     @property
@@ -321,21 +323,8 @@ class PhotoM:
             coords = np.repeat(coords, repeats=self.n_samples, axis=0)
         return coords
 
-    @update_fit
-    def __call__(self, source: np.ndarray) -> Union[zarr.Array, np.ndarray]:
-        """Computes interpolation given the `source` coordinates
-
-        Parameters
-        ----------
-        source : np.ndarray
-            (N, D) array of N points on the `t`, (`z`, OPTIONAL), `y`, `x` space.
-
-        Returns
-        -------
-        np.ndarray
-            (N, D + 1) first column is the TrackID of each source
-        """
-
+    def _preprocess_source(self, source: np.ndarray) -> np.ndarray:
+        """Validates and sample source if necessary"""
         source = np.atleast_2d(source)
 
         if source.ndim > 2:
@@ -352,7 +341,24 @@ class PhotoM:
         if np.any(source[:, 0] != t0):
             raise ValueError("All sources must belong to the same time point")
 
-        source = self._sample_sources(source)
+        return self._sample_sources(source)
+
+    @update_fit
+    def __call__(self, source: np.ndarray) -> Union[zarr.Array, np.ndarray]:
+        """Computes interpolation given the `source` coordinates
+
+        Parameters
+        ----------
+        source : np.ndarray
+            (N, D) array of N points on the `t`, (`z`, OPTIONAL), `y`, `x` space.
+
+        Returns
+        -------
+        np.ndarray
+            (N, D + 1) first column is the TrackID of each source
+        """
+        source = self._preprocess_source(source)
+        t0 = source[0, 0]
 
         pos = np.asarray(source[:, 1:])
         shape = pos.shape
