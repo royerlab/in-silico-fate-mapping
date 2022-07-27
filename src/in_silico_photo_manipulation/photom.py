@@ -7,6 +7,10 @@ import zarr
 from sklearn.neighbors import KNeighborsTransformer, RadiusNeighborsRegressor
 from tqdm import tqdm
 
+from in_silico_photo_manipulation.fast_radius_regression import (
+    FastRadiusRegressor,
+)
+
 
 def outdate_fit(method):
     """Records that model fit must be recomputed"""
@@ -85,11 +89,6 @@ class PhotoM:
                 f"data must be 2-dim array, found {value.ndim}-dim"
             )
 
-        if value.shape[1] == 4:
-            self._spatial_columns = ["y", "x"]
-        elif value.shape[1] == 5:
-            self._spatial_columns = ["z", "y", "x"]
-
         if not isinstance(value, pd.DataFrame):
             if (
                 value.shape[1] != 4 and value.shape[1] != 5
@@ -97,9 +96,21 @@ class PhotoM:
                 raise ValueError(
                     f"data must have length 4 or 5 at 1-axis, found {value.shape[1]}"
                 )
+            elif value.shape[1] == 4:
+                self._spatial_columns = ["y", "x"]
+
+            if value.shape[1] == 5:
+                self._spatial_columns = ["z", "y", "x"]
+
             value = pd.DataFrame(
                 value, columns=self._base_colnames[:2] + self._spatial_columns
             )
+
+        else:
+            if "z" in value.columns:
+                self._spatial_columns = ["z", "y", "x"]
+            else:
+                self._spatial_columns = ["y", "x"]
 
         not_found = [c for c in self._base_colnames if c not in value.columns]
 
@@ -221,9 +232,11 @@ class PhotoM:
                 Y = np.concatenate((Y, next_df[neighbors]), axis=0)
 
         # build regression model
-        return RadiusNeighborsRegressor(
+        return FastRadiusRegressor(
             radius=self.radius,
             weights=self.weights,
+            algorithm="kd_tree",
+            leaf_size=5,
             n_jobs=8,
         ).fit(X, Y)
 

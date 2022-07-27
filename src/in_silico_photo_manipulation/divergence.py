@@ -97,6 +97,7 @@ class Divergence(PhotoM):
         )  # (D, N, K)
         stddev = end_points.std(axis=-1)  # (D, N)
         stddev = stddev.sum(axis=0)  # (N,)
+        stddev = np.nan_to_num(stddev)
 
         divergence = np.zeros(mask.shape, dtype=np.float32)
         divergence[mask] = stddev
