@@ -76,28 +76,20 @@ class Divergence(PhotoM):
         _noise = self._get_noise_function(shape)
 
         valid = self._valid_rows(pos)
-        end_points = np.zeros_like(pos)
 
         for t in tqdm(self.time_iter(t0=int(round(t0))), "Computing paths"):
             X = (pos + _noise())[valid]
             if len(X) == 0:
                 break
-            pos[valid] = self._models[t].predict(X)
-            valid = self._valid_rows(X)
-            # points that disappear are added to end points
-            not_valid = np.logical_not(valid)
-            end_points[not_valid] = pos[not_valid]
-        else:
-            # when finished all are added to end points
-            end_points[valid] = pos[valid]
+            next_pos = self._models[t].predict(X)
+            new_valid = self._valid_rows(next_pos)
+            valid[valid] &= new_valid
+            pos[valid] = next_pos[new_valid]
 
-        end_points = end_points.T  # (D, K * N), K = n_samples
-        end_points = end_points.reshape(
-            (shape[1], -1, self.n_samples)
-        )  # (D, N, K)
-        stddev = end_points.std(axis=-1)  # (D, N)
+        pos = pos.T  # (D, K * N), K = n_samples
+        pos = pos.reshape((shape[1], -1, self.n_samples))  # (D, N, K)
+        stddev = pos.std(axis=-1)  # (D, N)
         stddev = stddev.sum(axis=0)  # (N,)
-        stddev = np.nan_to_num(stddev)
 
         divergence = np.zeros(mask.shape, dtype=np.float32)
         divergence[mask] = stddev

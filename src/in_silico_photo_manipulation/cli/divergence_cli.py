@@ -55,6 +55,13 @@ def disk(rank: int, radius: int) -> np.ndarray:
     type=click.Path(exists=True, path_type=Path),
     default=None,
 )
+@click.option("--quiet", "-q", type=bool, default=False, is_flag=True)
+@click.option(
+    "--downsample",
+    type=float,
+    default=None,
+    help="Downsample result (CUPY required).",
+)
 def div(
     tracks_path: Path,
     time_point: int,
@@ -63,11 +70,15 @@ def div(
     dilation: int,
     z_scale: float,
     output_path: Optional[Path],
+    quiet: bool,
+    downsample: Optional[float],
 ) -> None:
     """Computes the divergence of tracks from a given time point"""
 
     if output_path is None:
-        output_path = Path(f"output_tp_{time_point}_dilation{dilation}.tif")
+        output_path = Path(
+            f"output_tp_{time_point:05d}_dilation_{dilation}.tif"
+        )
 
     tracks = pd.read_csv(tracks_path)
     tracks["z"] *= z_scale
@@ -92,7 +103,14 @@ def div(
 
     heatmap = divergence(mask, time_point)
 
+    if downsample is not None:
+        import cupy as cp
+        from cupyx.scipy.ndimage import zoom
+
+        heatmap = zoom(cp.asarray(heatmap), downsample).get()
+
     imwrite(output_path, heatmap)
 
-    napari.view_image(heatmap, colormap="magma")
-    napari.run()
+    if not quiet:
+        napari.view_image(heatmap, colormap="magma")
+        napari.run()
