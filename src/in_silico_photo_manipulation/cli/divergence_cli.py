@@ -62,6 +62,14 @@ def disk(rank: int, radius: int) -> np.ndarray:
     default=None,
     help="Downsample result (CUPY required).",
 )
+@click.option(
+    "--max-length",
+    "-ml",
+    type=int,
+    default=None,
+    show_default=True,
+    help="Length (in time) to stop divergence computation.",
+)
 def div(
     tracks_path: Path,
     time_point: int,
@@ -72,6 +80,7 @@ def div(
     output_path: Optional[Path],
     quiet: bool,
     downsample: Optional[float],
+    max_length: Optional[int],
 ) -> None:
     """Computes the divergence of tracks from a given time point"""
 
@@ -101,7 +110,7 @@ def div(
         struct = disk(mask.ndim, dilation)
         mask = binary_dilation(mask, struct)
 
-    heatmap = divergence(mask, time_point)
+    heatmap = divergence(mask, time_point, max_length)
 
     if downsample is not None:
         try:
