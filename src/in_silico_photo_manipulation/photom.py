@@ -245,7 +245,9 @@ class PhotoM:
         """Time step"""
         return -1 if self.reverse else 1
 
-    def time_iter(self, t0: Optional[int] = None) -> Iterable[int]:
+    def time_iter(
+        self, t0: Optional[int] = None, max_length: Optional[int] = None
+    ) -> Iterable[int]:
         """Time step iterable, starting at `t0`"""
         if t0 is not None and (t0 < self._tmin or t0 > self._tmax):
             raise ValueError(
@@ -255,11 +257,23 @@ class PhotoM:
         if self.reverse:
             if t0 is None:
                 t0 = self._tmax
-            return range(t0, self._tmin, self.step)
+
+            # computing stop with boundary checking
+            tN = self._tmin
+            if max_length is not None:
+                tN = max(tN, t0 - max_length)
+
+            return range(t0, tN, self.step)
         else:
             if t0 is None:
                 t0 = self._tmin
-            return range(t0, self._tmax, self.step)
+
+            # computing stop with boundary checking
+            tN = self._tmax
+            if max_length is not None:
+                tN = min(tN, t0 + max_length)
+
+            return range(t0, tN, self.step)
 
     def _compute_heatmap(self, paths: np.ndarray) -> zarr.Array:
         """Accumulates frequency of `path` hits"""

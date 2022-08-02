@@ -47,7 +47,12 @@ class Divergence(PhotoM):
         )
 
     @update_fit
-    def __call__(self, mask: np.ndarray, time_point: int) -> np.ndarray:
+    def __call__(
+        self,
+        mask: np.ndarray,
+        time_point: int,
+        max_length: Optional[int] = None,
+    ) -> np.ndarray:
         """Returns divergence measurement of given mask starting from the given time point.
 
         Parameters
@@ -77,7 +82,10 @@ class Divergence(PhotoM):
 
         valid = self._valid_rows(pos)
 
-        for t in tqdm(self.time_iter(t0=int(round(t0))), "Computing paths"):
+        for t in tqdm(
+            self.time_iter(t0=int(round(t0)), max_length=max_length),
+            "Computing paths",
+        ):
             X = (pos + _noise())[valid]
             if len(X) == 0:
                 break
