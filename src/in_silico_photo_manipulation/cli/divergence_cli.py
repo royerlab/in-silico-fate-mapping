@@ -104,10 +104,15 @@ def div(
     heatmap = divergence(mask, time_point)
 
     if downsample is not None:
-        import cupy as cp
-        from cupyx.scipy.ndimage import zoom
+        try:
+            import cupy as cp
+            from cupyx.scipy.ndimage import zoom
 
-        heatmap = zoom(cp.asarray(heatmap), downsample).get()
+            heatmap = zoom(cp.asarray(heatmap), downsample).get()
+        except ImportError:
+            from scipy.ndimage import zoom
+
+            heatmap = zoom(heatmap, downsample)
 
     imwrite(output_path, heatmap)
 
