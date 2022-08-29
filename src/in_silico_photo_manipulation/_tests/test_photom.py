@@ -15,9 +15,10 @@ def _line(n_samples: int = 5, length: int = 50, dim: int = 3) -> np.ndarray:
     weight = np.linspace(0, 1, num=length)[:, np.newaxis]
     tracks = np.empty((n_samples, length, dim + 2), dtype=float)
     line = start * (1 - weight) + end * weight
+    time = np.arange(length)
     for i in range(n_samples):
         tracks[i, :, 0] = i + 1
-        tracks[i, :, 1] = np.arange(length)
+        tracks[i, :, 1] = time
         tracks[i, :, 2:] = line + rng.normal(size=(length, dim))
     return tracks.reshape((n_samples * length, dim + 2))
 

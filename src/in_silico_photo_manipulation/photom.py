@@ -7,6 +7,10 @@ import zarr
 from sklearn.neighbors import KNeighborsTransformer, RadiusNeighborsRegressor
 from tqdm import tqdm
 
+from in_silico_photo_manipulation.fast_radius_regression import (
+    FastRadiusRegressor,
+)
+
 
 def outdate_fit(method):
     """Records that model fit must be recomputed"""
@@ -85,11 +89,6 @@ class PhotoM:
                 f"data must be 2-dim array, found {value.ndim}-dim"
             )
 
-        if value.shape[1] == 4:
-            self._spatial_columns = ["y", "x"]
-        elif value.shape[1] == 5:
-            self._spatial_columns = ["z", "y", "x"]
-
         if not isinstance(value, pd.DataFrame):
             if (
                 value.shape[1] != 4 and value.shape[1] != 5
@@ -97,9 +96,21 @@ class PhotoM:
                 raise ValueError(
                     f"data must have length 4 or 5 at 1-axis, found {value.shape[1]}"
                 )
+            elif value.shape[1] == 4:
+                self._spatial_columns = ["y", "x"]
+
+            if value.shape[1] == 5:
+                self._spatial_columns = ["z", "y", "x"]
+
             value = pd.DataFrame(
                 value, columns=self._base_colnames[:2] + self._spatial_columns
             )
+
+        else:
+            if "z" in value.columns:
+                self._spatial_columns = ["z", "y", "x"]
+            else:
+                self._spatial_columns = ["y", "x"]
 
         not_found = [c for c in self._base_colnames if c not in value.columns]
 
@@ -221,8 +232,12 @@ class PhotoM:
                 Y = np.concatenate((Y, next_df[neighbors]), axis=0)
 
         # build regression model
-        return RadiusNeighborsRegressor(
-            radius=self.radius, weights=self.weights
+        return FastRadiusRegressor(
+            radius=self.radius,
+            weights=self.weights,
+            algorithm="kd_tree",
+            leaf_size=5,
+            n_jobs=8,
         ).fit(X, Y)
 
     @property
@@ -230,7 +245,9 @@ class PhotoM:
         """Time step"""
         return -1 if self.reverse else 1
 
-    def time_iter(self, t0: Optional[int] = None) -> Iterable[int]:
+    def time_iter(
+        self, t0: Optional[int] = None, max_length: Optional[int] = None
+    ) -> Iterable[int]:
         """Time step iterable, starting at `t0`"""
         if t0 is not None and (t0 < self._tmin or t0 > self._tmax):
             raise ValueError(
@@ -240,11 +257,23 @@ class PhotoM:
         if self.reverse:
             if t0 is None:
                 t0 = self._tmax
-            return range(t0, self._tmin, self.step)
+
+            # computing stop with boundary checking
+            tN = self._tmin
+            if max_length is not None:
+                tN = max(tN, t0 - max_length)
+
+            return range(t0, tN, self.step)
         else:
             if t0 is None:
                 t0 = self._tmin
-            return range(t0, self._tmax, self.step)
+
+            # computing stop with boundary checking
+            tN = self._tmax
+            if max_length is not None:
+                tN = min(tN, t0 + max_length)
+
+            return range(t0, tN, self.step)
 
     def _compute_heatmap(self, paths: np.ndarray) -> zarr.Array:
         """Accumulates frequency of `path` hits"""
@@ -321,21 +350,8 @@ class PhotoM:
             coords = np.repeat(coords, repeats=self.n_samples, axis=0)
         return coords
 
-    @update_fit
-    def __call__(self, source: np.ndarray) -> Union[zarr.Array, np.ndarray]:
-        """Computes interpolation given the `source` coordinates
-
-        Parameters
-        ----------
-        source : np.ndarray
-            (N, D) array of N points on the `t`, (`z`, OPTIONAL), `y`, `x` space.
-
-        Returns
-        -------
-        np.ndarray
-            (N, D + 1) first column is the TrackID of each source
-        """
-
+    def _preprocess_source(self, source: np.ndarray) -> np.ndarray:
+        """Validates and sample source if necessary"""
         source = np.atleast_2d(source)
 
         if source.ndim > 2:
@@ -352,7 +368,24 @@ class PhotoM:
         if np.any(source[:, 0] != t0):
             raise ValueError("All sources must belong to the same time point")
 
-        source = self._sample_sources(source)
+        return self._sample_sources(source)
+
+    @update_fit
+    def __call__(self, source: np.ndarray) -> Union[zarr.Array, np.ndarray]:
+        """Computes interpolation given the `source` coordinates
+
+        Parameters
+        ----------
+        source : np.ndarray
+            (N, D) array of N points on the `t`, (`z`, OPTIONAL), `y`, `x` space.
+
+        Returns
+        -------
+        np.ndarray
+            (N, D + 1) first column is the TrackID of each source
+        """
+        source = self._preprocess_source(source)
+        t0 = source[0, 0]
 
         pos = np.asarray(source[:, 1:])
         shape = pos.shape
