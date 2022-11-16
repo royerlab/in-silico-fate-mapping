@@ -69,7 +69,7 @@ class FastRadiusRegressor(RadiusNeighborsRegressor):
         neigh_dst = np.concatenate(neigh_ind, axis=0)
         neigh_src = np.repeat(np.arange(size), repeats=lengths)
 
-        weights = _get_flat_weights(neigh_dist, self.weights, size)
+        weights = _get_flat_weights(neigh_dist, self.weights, len(neigh_src))
         weights = sparse.csr_matrix(
             (weights, (neigh_src, neigh_dst)), shape=(size, training_size)
         )

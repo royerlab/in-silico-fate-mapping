@@ -140,7 +140,7 @@ class PhotoMWidget(Container):
     def _on_run(self) -> None:
         layer: Points = self._points_layer_w.value
         if layer is None:
-            raise ValueError("points layer must be set before running")
+            raise ValueError("Points layer must be set before running")
 
         coords = layer.data
         if len(coords) == 0:
