@@ -76,9 +76,10 @@ class FastRadiusRegressor(RadiusNeighborsRegressor):
 
         # invert distance and assign binary encoding to point with zero distance to training points
         if self.weights == "distance":
-            weights.data = np.where(
-                weights.data == 0.0, dist_zero_constant, 1.0 / weights.data
-            )
+            with np.errstate(divide="ignore", invalid="ignore"):
+                weights.data = np.where(
+                    weights.data == 0.0, dist_zero_constant, 1.0 / weights.data
+                )
 
         return weights
 
@@ -107,7 +108,7 @@ class FastRadiusRegressor(RadiusNeighborsRegressor):
 
         norm_factor = weights.sum(axis=1)
         y_pred = weights @ _y
-        with np.errstate(divide="ignore"):
+        with np.errstate(divide="ignore", invalid="ignore"):
             y_pred = np.where(norm_factor > 0, y_pred / norm_factor, np.nan)
 
         if np.any(np.isnan(y_pred)):

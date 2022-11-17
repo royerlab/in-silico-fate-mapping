@@ -231,6 +231,9 @@ class PhotoM:
                 X = np.concatenate((X, split_df), axis=0)
                 Y = np.concatenate((Y, next_df[neighbors]), axis=0)
 
+        # converting location to direction
+        Y = Y - X
+
         # build regression model
         return FastRadiusRegressor(
             radius=self.radius,
@@ -394,11 +397,10 @@ class PhotoM:
 
         paths = [self._as_track(t0, pos)]
         for t in tqdm(self.time_iter(t0=int(round(t0))), "Computing paths"):
-            valid = self._valid_rows(pos)
-            X = (pos + _noise())[valid]
-            if len(X) == 0:
-                break
-            pos[valid] = self._models[t].predict(X)
+            shift = self._models[t].predict(pos + _noise())
+            np.nan_to_num(shift, copy=False)
+
+            pos += shift
             paths.append(self._as_track(t + self.step, pos))
 
         paths = np.concatenate(paths, axis=0)
