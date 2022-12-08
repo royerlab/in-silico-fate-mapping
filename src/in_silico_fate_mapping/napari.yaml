@@ -21,4 +21,4 @@ contributions:
       filename_extensions: ['*.csv']
   widgets:
     - command: in-silico-fate-mapping.make_fate_map
-      display_name: Fate Mapping Manipulation
+      display_name: Fate Mapping
