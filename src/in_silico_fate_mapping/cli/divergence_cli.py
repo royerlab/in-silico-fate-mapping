@@ -12,7 +12,7 @@ from scipy.ndimage import (
 )
 from tifffile import imwrite
 
-from in_silico_photo_manipulation.divergence import Divergence
+from in_silico_fate_mapping.divergence import Divergence
 
 
 def disk(rank: int, radius: int) -> np.ndarray:

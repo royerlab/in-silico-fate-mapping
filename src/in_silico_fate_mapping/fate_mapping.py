@@ -7,9 +7,7 @@ import zarr
 from sklearn.neighbors import KNeighborsTransformer, RadiusNeighborsRegressor
 from tqdm import tqdm
 
-from in_silico_photo_manipulation.fast_radius_regression import (
-    FastRadiusRegressor,
-)
+from in_silico_fate_mapping.fast_radius_regression import FastRadiusRegressor
 
 
 def outdate_fit(method):
@@ -35,7 +33,7 @@ def update_fit(method):
     return wrapper
 
 
-class PhotoM:
+class FateMapping:
     def __init__(
         self,
         data: Optional[Union[pd.DataFrame, np.ndarray]] = None,
@@ -48,7 +46,7 @@ class PhotoM:
         bind_to_existing: bool = True,
     ) -> None:
         """
-        Simulates a photo manipulation experiment from a set of tracks by interpolating coordinates at each time step.
+        Simulates a fate map experiment from a set of tracks by interpolating coordinates at each time step.
 
         Parameters
         ----------
@@ -174,7 +172,7 @@ class PhotoM:
     def _fit(self) -> None:
         """Fits a model for each time point"""
         if self._data is None:
-            raise ValueError("Data must be set before executing PhotoM")
+            raise ValueError("Data must be set before executing Fate Mapping")
 
         self._models = {
             t: self._fit_model(t)

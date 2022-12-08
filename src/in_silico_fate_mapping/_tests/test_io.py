@@ -6,7 +6,7 @@ import pandas as pd
 import pytest
 from napari import Viewer, save_layers
 
-from in_silico_photo_manipulation._reader import napari_get_reader
+from in_silico_fate_mapping._reader import napari_get_reader
 
 ViewerMaker = Callable[[], Viewer]
 
@@ -54,7 +54,7 @@ def test_napari_read(
     tracks.to_csv(path, index=False)
 
     viewer = make_napari_viewer()
-    (layer,) = viewer.open(path, plugin="in-silico-photo-manipulation")
+    (layer,) = viewer.open(path, plugin="in-silico-fate-mapping")
 
     assert layer is not None
     assert np.allclose(layer.data, tracks)
@@ -75,7 +75,7 @@ def test_napari_write_and_read(
     assert outpath == path
 
     viewer.layers.clear()
-    (layer,) = viewer.open(outpath, plugin="in-silico-photo-manipulation")
+    (layer,) = viewer.open(outpath, plugin="in-silico-fate-mapping")
 
     assert np.allclose(layer.data, tracks)
 

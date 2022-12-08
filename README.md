@@ -1,11 +1,11 @@
-# in-silico-photo-manipulation
+# in-silico-fate-mapping
 
-[![License BSD-3](https://img.shields.io/pypi/l/in-silico-photo-manipulation.svg?color=green)](https://github.com/royerlab/in-silico-photo-manipulation/raw/main/LICENSE)
-[![PyPI](https://img.shields.io/pypi/v/in-silico-photo-manipulation.svg?color=green)](https://pypi.org/project/in-silico-photo-manipulation)
-[![Python Version](https://img.shields.io/pypi/pyversions/in-silico-photo-manipulation.svg?color=green)](https://python.org)
-[![tests](https://github.com/royerlab/in-silico-photo-manipulation/workflows/tests/badge.svg)](https://github.com/royerlab/in-silico-photo-manipulation/actions)
-[![codecov](https://codecov.io/gh/royerlab/in-silico-photo-manipulation/branch/main/graph/badge.svg)](https://codecov.io/gh/royerlab/in-silico-photo-manipulation)
-[![napari hub](https://img.shields.io/endpoint?url=https://api.napari-hub.org/shields/in-silico-photo-manipulation)](https://napari-hub.org/plugins/in-silico-photo-manipulation)
+[![License BSD-3](https://img.shields.io/pypi/l/in-silico-fate-mapping.svg?color=green)](https://github.com/royerlab/in-silico-fate-mapping/raw/main/LICENSE)
+[![PyPI](https://img.shields.io/pypi/v/in-silico-fate-mapping.svg?color=green)](https://pypi.org/project/in-silico-fate-mapping)
+[![Python Version](https://img.shields.io/pypi/pyversions/in-silico-fate-mapping.svg?color=green)](https://python.org)
+[![tests](https://github.com/royerlab/in-silico-fate-mapping/workflows/tests/badge.svg)](https://github.com/royerlab/in-silico-fate-mapping/actions)
+[![codecov](https://codecov.io/gh/royerlab/in-silico-fate-mapping/branch/main/graph/badge.svg)](https://codecov.io/gh/royerlab/in-silico-fate-mapping)
+[![napari hub](https://img.shields.io/endpoint?url=https://api.napari-hub.org/shields/in-silico-fate-mapping)](https://napari-hub.org/plugins/in-silico-fate-mapping)
 
 TODO
 
@@ -23,15 +23,15 @@ https://napari.org/plugins/index.html
 
 ## Installation
 
-You can install `in-silico-photo-manipulation` via [pip]:
+You can install `in-silico-fate-mapping` via [pip]:
 
-    pip install in-silico-photo-manipulation
+    pip install in-silico-fate-mapping
 
 
 
 To install latest development version :
 
-    pip install git+https://github.com/royerlab/in-silico-photo-manipulation.git
+    pip install git+https://github.com/royerlab/in-silico-fate-mapping.git
 
 
 ## Contributing
@@ -42,7 +42,7 @@ the coverage at least stays the same before you submit a pull request.
 ## License
 
 Distributed under the terms of the [BSD-3] license,
-"in-silico-photo-manipulation" is free and open source software
+"in-silico-fate-mapping" is free and open source software
 
 ## Issues
 
@@ -59,7 +59,7 @@ If you encounter any problems, please [file an issue] along with a detailed desc
 [Mozilla Public License 2.0]: https://www.mozilla.org/media/MPL/2.0/index.txt
 [cookiecutter-napari-plugin]: https://github.com/napari/cookiecutter-napari-plugin
 
-[file an issue]: https://github.com/royerlab/in-silico-photo-manipulation/issues
+[file an issue]: https://github.com/royerlab/in-silico-fate-mapping/issues
 
 [napari]: https://github.com/napari/napari
 [tox]: https://tox.readthedocs.io/en/latest/

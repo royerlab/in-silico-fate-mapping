@@ -1,4 +1,4 @@
-from in_silico_photo_manipulation import PhotoMWidget
+from in_silico_fate_mapping import FateMappingWidget
 
 
 # make_napari_viewer is a pytest fixture that returns a napari viewer object
@@ -7,7 +7,7 @@ def test_example_q_widget(make_napari_viewer, capsys):
     # make viewer and add an image layer using our fixture
     viewer = make_napari_viewer()
     # create our widget, passing in the viewer
-    _ = PhotoMWidget(viewer)
+    _ = FateMappingWidget(viewer)
 
     # # read captured output and check that it's as we expected
     # captured = capsys.readouterr()
