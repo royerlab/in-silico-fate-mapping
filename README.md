@@ -14,7 +14,8 @@ This napari plugin allows the estimation o cell fates from incomplete tracking d
 
 Video example below:
 
-<video src='.content/demo-fate-map.mp4' width=720></video>
+<video src='
+https://user-images.githubusercontent.com/21022743/216477828-656d843d-674f-4944-94c7-16d0472dfd3d.mp4' width=720></video>
 
 TODO: add to pypi
 
