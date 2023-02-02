@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from in_silico_photo_manipulation.photom import PhotoM
+from in_silico_fate_mapping.fate_mapping import FateMapping
 
 
 def _line(n_samples: int = 5, length: int = 50, dim: int = 3) -> np.ndarray:
@@ -38,14 +38,14 @@ def line_factory() -> Callable:
 
 @pytest.mark.parametrize("attr,value", [("reverse", True), ("radius", 5)])
 def test_lazy_fit(attr: str, value: Any, line: np.ndarray) -> None:
-    photom = PhotoM(data=line, reverse=True, radius=7, n_samples=5)
-    assert not photom._fitted
+    fate_map = FateMapping(data=line, reverse=True, radius=7, n_samples=5)
+    assert not fate_map._fitted
 
-    photom(line[0, 1:])
-    assert photom._fitted
+    fate_map(line[0, 1:])
+    assert fate_map._fitted
 
-    setattr(photom, attr, value)
-    assert not photom._fitted
+    setattr(fate_map, attr, value)
+    assert not fate_map._fitted
 
 
 def test_simple_reconstruction(
@@ -56,14 +56,14 @@ def test_simple_reconstruction(
 ) -> None:
 
     sigma = 1
-    photom = PhotoM(
+    fate_map = FateMapping(
         radius=5, n_samples=n_samples, bind_to_existing=False, sigma=sigma
     )
 
     line = line_factory(n_samples=1, length=length, dim=dim)
-    photom.data = line
+    fate_map.data = line
 
-    tracks = photom(line[0, 1:])
+    tracks = fate_map(line[0, 1:])
     assert tracks.shape == (n_samples * length, dim + 2)
 
     avg = tracks[:, 2:].reshape((n_samples, length, dim)).mean(axis=0)
@@ -72,8 +72,8 @@ def test_simple_reconstruction(
     error = np.mean(np.abs(avg - line[:, 2:]))
     assert error < 1e-8
 
-    photom.heatmap = True
-    heatmap = photom(line[0, 1:])
+    fate_map.heatmap = True
+    heatmap = fate_map(line[0, 1:])
 
     avg = (
         pd.DataFrame(np.asarray(np.nonzero(heatmap)).T)
@@ -87,19 +87,19 @@ def test_simple_reconstruction(
 
 
 def test_weights_attr(line: np.ndarray) -> None:
-    photom = PhotoM(data=line, weights="distance")
-    photom._fit()
-    for m in photom._models.values():
+    fate_map = FateMapping(data=line, weights="distance")
+    fate_map._fit()
+    for m in fate_map._models.values():
         assert m.weights == "distance"
 
-    photom.weights = "uniform"
-    for m in photom._models.values():
+    fate_map.weights = "uniform"
+    for m in fate_map._models.values():
         assert m.weights == "uniform"
 
 
 def test_binding_attr(line: np.ndarray) -> None:
-    photom = PhotoM(data=line, bind_to_existing=True, n_samples=5)
-    result = photom(line[0, 1:])
+    fate_map = FateMapping(data=line, bind_to_existing=True, n_samples=5)
+    result = fate_map(line[0, 1:])
 
     lines_start = np.sort(line[line[:, 1] == 0], axis=0)
     results_start = np.sort(result[result[:, 1] == 0], axis=0)

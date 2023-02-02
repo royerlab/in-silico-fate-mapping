@@ -11,10 +11,11 @@ from magicgui.widgets import (
 from napari.layers import Points, Tracks
 from toolz import curry
 
-from in_silico_photo_manipulation.photom import PhotoM
+from in_silico_fate_mapping.fate_mapping import FateMapping
+from in_silico_fate_mapping.widget_utils import wait_cursor
 
 
-class PhotoMWidget(Container):
+class FateMappingWidget(Container):
     def __init__(self, viewer: napari.Viewer):
         super().__init__()
         self._viewer = viewer
@@ -32,14 +33,14 @@ class PhotoMWidget(Container):
             annotation=Points,
             label="points",
             options=dict(
-                tooltip="points layer for photo manipulation area (starting/source point)"
+                tooltip="points layer for fate map area (starting/source point)"
             ),
         )
         self.append(self._points_layer_w)
 
         self._radius_w = FloatSpinBox(
             label="radius",
-            value=30,
+            value=25,
             step=5,
             tooltip="neighborhood radius used to interpolate each sample",
         )
@@ -47,7 +48,7 @@ class PhotoMWidget(Container):
 
         self._n_samples_w = SpinBox(
             label="n. samples",
-            value=25,
+            value=50,
             tooltip="number of samples at each starting point",
             max=10000,
         )
@@ -67,6 +68,7 @@ class PhotoMWidget(Container):
 
         self._weights_w = ComboBox(
             label="weights",
+            value="uniform",
             choices=("distance", "uniform"),
             tooltip="interpolation weight strategy",
         )
@@ -74,7 +76,7 @@ class PhotoMWidget(Container):
 
         self._sigma_w = FloatSpinBox(
             label="noise sigma",
-            value=0,
+            value=0.1,
             tooltip="interpolation (jitter) sigma at each step, ignored if 0",
         )
         self.append(self._sigma_w)
@@ -94,7 +96,7 @@ class PhotoMWidget(Container):
         )
         self.append(self._clear_btn)
 
-        self._photom = PhotoM(
+        self._fate_mapping = FateMapping(
             radius=self._radius_w.value,
             reverse=self._reverse_w.value,
             sigma=self._sigma_w.value,
@@ -111,31 +113,35 @@ class PhotoMWidget(Container):
         self._clear_btn.changed.connect(self._on_clear_points)
         self._tracks_layer_w.changed.connect(self._on_tracks_changed)
         self._reverse_w.changed.connect(
-            curry(setattr, self._photom, "reverse")
+            curry(setattr, self._fate_mapping, "reverse")
         )
-        self._radius_w.changed.connect(curry(setattr, self._photom, "radius"))
-        self._sigma_w.changed.connect(curry(setattr, self._photom, "sigma"))
+        self._radius_w.changed.connect(
+            curry(setattr, self._fate_mapping, "radius")
+        )
+        self._sigma_w.changed.connect(
+            curry(setattr, self._fate_mapping, "sigma")
+        )
         self._bind_w.changed.connect(
-            curry(setattr, self._photom, "bind_to_existing")
+            curry(setattr, self._fate_mapping, "bind_to_existing")
         )
         self._weights_w.changed.connect(
-            curry(setattr, self._photom, "weights")
+            curry(setattr, self._fate_mapping, "weights")
         )
         self._heatmap_w.changed.connect(
-            curry(setattr, self._photom, "heatmap")
+            curry(setattr, self._fate_mapping, "heatmap")
         )
         self._n_samples_w.changed.connect(
-            curry(setattr, self._photom, "n_samples")
+            curry(setattr, self._fate_mapping, "n_samples")
         )
 
     def _on_tracks_changed(self, layer: Tracks) -> None:
         if layer is None:
-            self._photom.data = layer
+            self._fate_mapping.data = layer
             return
         data = layer.data.copy()
         # converting to anisotropic space
         data[:, 1:] = layer._data_to_world(data[:, 1:])
-        self._photom.data = data
+        self._fate_mapping.data = data
 
     def _on_run(self) -> None:
         layer: Points = self._points_layer_w.value
@@ -148,18 +154,21 @@ class PhotoMWidget(Container):
 
         coords = layer._data_to_world(coords)
 
-        result = self._photom(coords)
+        # forcing update, scale, translation, or some other transform could have changed
+        self._on_tracks_changed(self._tracks_layer_w.value)
+        with wait_cursor():
+            result = self._fate_mapping(coords)
 
         if self._heatmap_w.value:
             self._viewer.add_image(
                 result,
                 colormap="magma",
                 blending="additive",
-                name="PhotoM Heatmap",
+                name="Fate Map Heatmap",
             )
         else:
             self._viewer.add_tracks(
-                result, colormap="hsv", name="PhotoM Tracks"
+                result, colormap="hsv", name="Fate Map Tracks"
             )
 
     def _on_clear_points(self) -> None:

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 
 [tool.setuptools_scm]
-write_to = "src/in_silico_photo_manipulation/_version.py"
+write_to = "src/in_silico_fate_mapping/_version.py"
 
 [tool.black]
 line-length = 79

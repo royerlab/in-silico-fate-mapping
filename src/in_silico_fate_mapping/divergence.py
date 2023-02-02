@@ -4,10 +4,10 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-from in_silico_photo_manipulation.photom import PhotoM, update_fit
+from in_silico_fate_mapping.fate_mapping import FateMapping, update_fit
 
 
-class Divergence(PhotoM):
+class Divergence(FateMapping):
     def __init__(
         self,
         data: Optional[Union[pd.DataFrame, np.ndarray]] = None,
@@ -18,7 +18,7 @@ class Divergence(PhotoM):
         n_samples: int = 25,
     ) -> None:
         """
-        Computes divergence of a given mask using the photo manipulation simulation.
+        Computes divergence of a given mask using the fate map simulation.
 
         Parameters
         ----------
