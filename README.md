@@ -1,4 +1,4 @@
-# in-silico-fate-mapping
+# in silico fate mapping
 
 [![License BSD-3](https://img.shields.io/pypi/l/in-silico-fate-mapping.svg?color=green)](https://github.com/royerlab/in-silico-fate-mapping/raw/main/LICENSE)
 [![PyPI](https://img.shields.io/pypi/v/in-silico-fate-mapping.svg?color=green)](https://pypi.org/project/in-silico-fate-mapping)
@@ -7,19 +7,14 @@
 [![codecov](https://codecov.io/gh/royerlab/in-silico-fate-mapping/branch/main/graph/badge.svg)](https://codecov.io/gh/royerlab/in-silico-fate-mapping)
 [![napari hub](https://img.shields.io/endpoint?url=https://api.napari-hub.org/shields/in-silico-fate-mapping)](https://napari-hub.org/plugins/in-silico-fate-mapping)
 
-TODO
 
-----------------------------------
+Interactive in silico fate mapping from tracking data.
 
-This [napari] plugin was generated with [Cookiecutter] using [@napari]'s [cookiecutter-napari-plugin] template.
+This napari plugin allows the estimation o cell fates from incomplete tracking data by building a radial regression model per time point. The user can interrogate different starting (ending) positions using a `Points` layer; the application will advent the probed coordinates forward (backward) in time, showing the estimated fate.
 
-<!--
-Don't miss the full getting started guide to set up your new package:
-https://github.com/napari/cookiecutter-napari-plugin#getting-started
+Video example below:
 
-and review the napari docs for plugin developers:
-https://napari.org/plugins/index.html
--->
+TODO: add to pypi
 
 ## Installation
 
@@ -28,21 +23,17 @@ You can install `in-silico-fate-mapping` via [pip]:
     pip install in-silico-fate-mapping
 
 
-
 To install latest development version :
 
     pip install git+https://github.com/royerlab/in-silico-fate-mapping.git
 
+## Citing
 
-## Contributing
+If used please cite:
 
-Contributions are very welcome. Tests can be run with [tox], please ensure
-the coverage at least stays the same before you submit a pull request.
-
-## License
-
-Distributed under the terms of the [BSD-3] license,
-"in-silico-fate-mapping" is free and open source software
+```
+TBD
+```
 
 ## Issues
 

@@ -12,6 +12,7 @@ from napari.layers import Points, Tracks
 from toolz import curry
 
 from in_silico_fate_mapping.fate_mapping import FateMapping
+from in_silico_fate_mapping.widget_utils import wait_cursor
 
 
 class FateMappingWidget(Container):
@@ -39,7 +40,7 @@ class FateMappingWidget(Container):
 
         self._radius_w = FloatSpinBox(
             label="radius",
-            value=30,
+            value=25,
             step=5,
             tooltip="neighborhood radius used to interpolate each sample",
         )
@@ -47,7 +48,7 @@ class FateMappingWidget(Container):
 
         self._n_samples_w = SpinBox(
             label="n. samples",
-            value=25,
+            value=50,
             tooltip="number of samples at each starting point",
             max=10000,
         )
@@ -67,6 +68,7 @@ class FateMappingWidget(Container):
 
         self._weights_w = ComboBox(
             label="weights",
+            value="uniform",
             choices=("distance", "uniform"),
             tooltip="interpolation weight strategy",
         )
@@ -74,7 +76,7 @@ class FateMappingWidget(Container):
 
         self._sigma_w = FloatSpinBox(
             label="noise sigma",
-            value=0,
+            value=0.1,
             tooltip="interpolation (jitter) sigma at each step, ignored if 0",
         )
         self.append(self._sigma_w)
@@ -152,7 +154,10 @@ class FateMappingWidget(Container):
 
         coords = layer._data_to_world(coords)
 
-        result = self._fate_mapping(coords)
+        # forcing update, scale, translation, or some other transform could have changed
+        self._on_tracks_changed(self._tracks_layer_w.value)
+        with wait_cursor():
+            result = self._fate_mapping(coords)
 
         if self._heatmap_w.value:
             self._viewer.add_image(
