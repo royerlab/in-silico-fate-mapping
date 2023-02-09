@@ -32,7 +32,7 @@ To install the latest development version :
 
 ## IO file format
 
-This does not depend on the file format, the only requirement is using a `Track` layer from napari.
+This plugin does not depend on a specific file format, the only requirement is using a `Track` layer from napari.
 
 Despite this, we ship a reader and writer interface. It supports `.csv` files with the following reader `TrackID, t, (z), y, x`, `z` is optional.
 Such that each tracklet has a unique `TrackID` and it's composed of a sequence o time and spatial coordinates.
