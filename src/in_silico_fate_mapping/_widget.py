@@ -27,7 +27,6 @@ class FateMappingWidget(Container):
                 tooltip="tracks layer used to compute the interpolation model"
             ),
         )
-        self.append(self._tracks_layer_w)
 
         self._points_layer_w = create_widget(
             annotation=Points,
@@ -36,65 +35,47 @@ class FateMappingWidget(Container):
                 tooltip="points layer for fate map area (starting/source point)"
             ),
         )
-        self.append(self._points_layer_w)
-
         self._radius_w = FloatSpinBox(
             label="radius",
             value=25,
             step=5,
             tooltip="neighborhood radius used to interpolate each sample",
         )
-        self.append(self._radius_w)
-
         self._n_samples_w = SpinBox(
             label="n. samples",
             value=50,
             tooltip="number of samples at each starting point",
             max=10000,
         )
-        self.append(self._n_samples_w)
-
         self._bind_w = CheckBox(
             label="bind to tracks",
             value=True,
             tooltip="bind sample to existing tracks at starting point",
         )
-        self.append(self._bind_w)
-
         self._reverse_w = CheckBox(
             label="reverse", tooltip="interpolate from end to start"
         )
-        self.append(self._reverse_w)
-
         self._weights_w = ComboBox(
             label="weights",
             value="uniform",
             choices=("distance", "uniform"),
             tooltip="interpolation weight strategy",
         )
-        self.append(self._weights_w)
-
         self._sigma_w = FloatSpinBox(
             label="noise sigma",
             value=0.1,
             tooltip="interpolation (jitter) sigma at each step, ignored if 0",
         )
-        self.append(self._sigma_w)
-
         self._heatmap_w = CheckBox(
             label="heatmap",
             value=False,
             tooltip="output an heatmap, by default it return tracks",
         )
-        self.append(self._heatmap_w)
-
         self._run_btn = PushButton(text="run", tooltip="RUNNNNNNN")
-        self.append(self._run_btn)
 
         self._clear_btn = PushButton(
             text="clear points", tooltip="clear the selected points layer"
         )
-        self.append(self._clear_btn)
 
         self._fate_mapping = FateMapping(
             radius=self._radius_w.value,
@@ -107,6 +88,18 @@ class FateMappingWidget(Container):
         )
 
         self._setup_signals()
+
+        self.append(self._tracks_layer_w)
+        self.append(self._points_layer_w)
+        self.append(self._radius_w)
+        self.append(self._n_samples_w)
+        self.append(self._bind_w)
+        self.append(self._reverse_w)
+        self.append(self._weights_w)
+        self.append(self._sigma_w)
+        self.append(self._heatmap_w)
+        self.append(self._run_btn)
+        self.append(self._clear_btn)
 
     def _setup_signals(self) -> None:
         self._run_btn.changed.connect(self._on_run)
