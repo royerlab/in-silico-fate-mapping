@@ -14,8 +14,7 @@ This napari plugin estimates the cell fates from tracking data by building a rad
 
 Video example below:
 
-<video src='
-https://user-images.githubusercontent.com/21022743/216478216-89c1c35f-2ce4-44e8-adb8-9aeea75b5833.mp4' width=720></video>
+https://user-images.githubusercontent.com/21022743/216478216-89c1c35f-2ce4-44e8-adb8-9aeea75b5833.mp4
 
 ## Installation
 
