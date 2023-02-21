@@ -10,25 +10,36 @@
 
 Interactive in silico fate mapping from tracking data.
 
-This napari plugin allows the estimation o cell fates from incomplete tracking data by building a radial regression model per time point. The user can interrogate different starting (ending) positions using a `Points` layer; the application will advent the probed coordinates forward (backward) in time, showing the estimated fate.
+This napari plugin estimates the cell fates from tracking data by building a radial regression model per time point. The user can select an area of interest using a `Points` layer; the algorithm will advent the probed coordinates forward (or backward) in time, showing the estimated fate.
 
 Video example below:
 
-<video src='
-https://user-images.githubusercontent.com/21022743/216478216-89c1c35f-2ce4-44e8-adb8-9aeea75b5833.mp4' width=720></video>
-
-TODO: add to pypi
+https://user-images.githubusercontent.com/21022743/216478216-89c1c35f-2ce4-44e8-adb8-9aeea75b5833.mp4
 
 ## Installation
+
+TODO: add to pypi
 
 You can install `in-silico-fate-mapping` via [pip]:
 
     pip install in-silico-fate-mapping
 
 
-To install latest development version :
+To install the latest development version :
 
     pip install git+https://github.com/royerlab/in-silico-fate-mapping.git
+
+
+## IO file format
+
+This plugin does not depend on a specific file format, the only requirement is using a `Track` layer from napari.
+
+Despite this, we ship a reader and writer interface. It supports `.csv` files with the following reader `TrackID, t, (z), y, x`, `z` is optional.
+Such that each tracklet has a unique `TrackID` and it's composed of a sequence o time and spatial coordinates.
+
+This is extremely similar to how napari store tracks, more information can be found [here](https://napari.org/stable/howtos/layers/tracks.html).
+
+Divisions are not supported at the moment.
 
 ## Citing
 
