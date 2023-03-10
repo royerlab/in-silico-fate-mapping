@@ -1,0 +1,31 @@
+type: article
+title: Zebrahub-Multimodal Zebrafish Developmental Atlas Reveals the State Transition
+  Dynamics of Late Vertebrate Pluripotent Axial Progenitors
+authors:
+- family-names: Lange
+  given-names: Merlin
+- family-names: Granados
+  given-names: Alejandro
+- family-names: VijayKumar
+  given-names: Shruthi
+- family-names: Bragantini
+  given-names: Jordao
+- family-names: Ancheta
+  given-names: Sarah
+- family-names: Santhosh
+  given-names: Sreejith
+- family-names: Borja
+  given-names: Michael
+- family-names: Kobayashi
+  given-names: Hirofumi
+- family-names: McGeever
+  given-names: Erin
+- family-names: Solak
+  given-names: Ahmet Can
+- name: others
+journal: bioRxiv
+year: '2023'
+publisher:
+  name: Cold Spring Harbor Laboratory
+start: '2023'
+end: '03'

@@ -18,8 +18,6 @@ https://user-images.githubusercontent.com/21022743/216478216-89c1c35f-2ce4-44e8-
 
 ## Installation
 
-TODO: add to pypi
-
 You can install `in-silico-fate-mapping` via [pip]:
 
     pip install in-silico-fate-mapping
@@ -41,12 +39,39 @@ This is extremely similar to how napari store tracks, more information can be fo
 
 Divisions are not supported at the moment.
 
+## Usage Example
+
+```python3
+import napari
+import pandas as pd
+from in_silico_fate_mapping.fate_mapping import FateMapping
+
+tracks = pd.read_csv("tracks.csv")
+
+fate_map = FateMapping(radius=5, n_samples=25, bind_to_existing=False, sigma=1)
+fate_map.data = tracks[["TrackID", "t", "z", "y", "x"]]
+
+source = tracks[tracks["t"] == 0].sample(n=1)
+
+tracks = fate_map(source[["t", "z", "y", "x"]])
+
+napari.view_tracks(tracks)
+napari.run()
+```
+
 ## Citing
 
 If used please cite:
 
 ```
-TBD
+@article{lange2023zebrahub,
+  title={Zebrahub-Multimodal Zebrafish Developmental Atlas Reveals the State Transition Dynamics of Late Vertebrate Pluripotent Axial Progenitors},
+  author={Lange, Merlin and Granados, Alejandro and VijayKumar, Shruthi and Bragantini, Jordao and Ancheta, Sarah and Santhosh, Sreejith and Borja, Michael and Kobayashi, Hirofumi and McGeever, Erin and Solak, Ahmet Can and others},
+  journal={bioRxiv},
+  pages={2023--03},
+  year={2023},
+  publisher={Cold Spring Harbor Laboratory}
+}
 ```
 
 ## Issues
