@@ -18,8 +18,6 @@ https://user-images.githubusercontent.com/21022743/216478216-89c1c35f-2ce4-44e8-
 
 ## Installation
 
-TODO: add to pypi
-
 You can install `in-silico-fate-mapping` via [pip]:
 
     pip install in-silico-fate-mapping
@@ -40,6 +38,26 @@ Such that each tracklet has a unique `TrackID` and it's composed of a sequence o
 This is extremely similar to how napari store tracks, more information can be found [here](https://napari.org/stable/howtos/layers/tracks.html).
 
 Divisions are not supported at the moment.
+
+## Usage Example
+
+```python3
+import napari
+import pandas as pd
+from in_silico_fate_mapping.fate_mapping import FateMapping
+
+tracks = pd.read_csv("tracks.csv")
+
+fate_map = FateMapping(radius=5, n_samples=25, bind_to_existing=False, sigma=1)
+fate_map.data = tracks[["TrackID", "t", "z", "y", "x"]]
+
+source = tracks[tracks["t"] == 0].sample(n=1)
+
+tracks = fate_map(source[["t", "z", "y", "x"]])
+
+napari.view_tracks(tracks)
+napari.run()
+```
 
 ## Citing
 
