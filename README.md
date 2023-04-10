@@ -41,6 +41,10 @@ Divisions are not supported at the moment.
 
 ## Usage Example
 
+### Minimal example
+
+Minimal example using a track file following the convention described above.
+
 ```python3
 import napari
 import pandas as pd
@@ -56,6 +60,30 @@ source = tracks[tracks["t"] == 0].sample(n=1)
 tracks = fate_map(source[["t", "z", "y", "x"]])
 
 napari.view_tracks(tracks)
+napari.run()
+```
+
+### Zebrahub example
+
+Zebrafish embryo tail example. This example requires the package `napari-ome-zarr`.
+
+```python3
+import napari
+import pandas as pd
+from in_silico_fate_mapping import FateMappingWidget
+
+image_path = "http://public.czbiohub.org/royerlab/zebrahub/imaging/single-objective/ZSNS001_tail.ome.zarr"
+tracks_path = "http://public.czbiohub.org/royerlab/zebrahub/imaging/single-objective/ZSNS001_tail_tracks.csv"
+
+viewer = napari.Viewer()
+viewer.window.add_dock_widget(FateMappingWidget(viewer))
+
+viewer.open(image_path, plugin="napari-ome-zarr")
+
+tracks = pd.read_csv(tracks_path)
+viewer.add_tracks(tracks[["TrackID", "t", "z", "y", "x"]])
+viewer.add_points(name="Markers")
+
 napari.run()
 ```
 
