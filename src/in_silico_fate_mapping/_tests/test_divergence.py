@@ -2,7 +2,7 @@ from typing import Tuple
 
 import numpy as np
 
-from in_silico_photo_manipulation.divergence import Divergence
+from in_silico_fate_mapping.divergence import Divergence
 
 
 def _random_tracks(

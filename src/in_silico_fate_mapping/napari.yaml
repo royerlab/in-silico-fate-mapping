@@ -1,0 +1,24 @@
+name: in-silico-fate-mapping
+display_name: In Silico Fate Mapping
+contributions:
+  commands:
+    - id: in-silico-fate-mapping.get_reader
+      python_name: in_silico_fate_mapping._reader:napari_get_reader
+      title: Open .csv tracking data
+    - id: in-silico-fate-mapping.write_tracks
+      python_name: in_silico_fate_mapping._writer:napari_write_tracks
+      title: Write tracking data to .csv
+    - id: in-silico-fate-mapping.make_fate_map
+      python_name: in_silico_fate_mapping._widget:FateMappingWidget
+      title: Fate Mapping
+  readers:
+    - command: in-silico-fate-mapping.get_reader
+      accepts_directories: false
+      filename_patterns: ['*.csv']
+  writers:
+    - command: in-silico-fate-mapping.write_tracks
+      layer_types: ['tracks']
+      filename_extensions: ['*.csv']
+  widgets:
+    - command: in-silico-fate-mapping.make_fate_map
+      display_name: Fate Mapping
