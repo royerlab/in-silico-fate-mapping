@@ -82,7 +82,7 @@ viewer.open(image_path, plugin="napari-ome-zarr")
 
 tracks = pd.read_csv(tracks_path)
 viewer.add_tracks(tracks[["TrackID", "t", "z", "y", "x"]])
-viewer.add_points(name="Markers")
+viewer.add_points(name="Markers", ndim=4)
 
 napari.run()
 ```
