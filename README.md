@@ -18,10 +18,15 @@ https://user-images.githubusercontent.com/21022743/216478216-89c1c35f-2ce4-44e8-
 
 ## Installation
 
-You can install `in-silico-fate-mapping` via [pip]:
+We suggest you create a fresh conda environment to avoid conflicts with your existing package.
+To do this, you need to:
 
-    pip install in-silico-fate-mapping
+    conda create -n fatemap python=3.11
+    conda activate fatemap
 
+And then, you can install `in-silico-fate-mapping` via [pip] and other additional useful packages:
+
+    pip install ultrack napari-ome-zarr napari[all] in-silicio-fate-mapping
 
 To install the latest development version :
 
