@@ -8,7 +8,8 @@ from in_silico_fate_mapping._reader import TRACKS_HEADER
 
 def napari_write_tracks(path: str, data: np.ndarray, meta: dict) -> List[str]:
 
-    header = list(TRACKS_HEADER)
+    # first position are the default
+    header = list(c[0] for c in TRACKS_HEADER)
     if data.shape[1] == 4:
         header.remove("z")
 

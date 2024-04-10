@@ -3,7 +3,13 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-TRACKS_HEADER = ("TrackID", "t", "z", "y", "x")
+TRACKS_HEADER = (
+    ("track_id", "TrackID"),
+    ("t", "T"),
+    ("z", "Z"),
+    ("y", "Z"),
+    ("x", "X"),
+)
 
 
 def napari_get_reader(path):
@@ -17,8 +23,8 @@ def napari_get_reader(path):
         return None
 
     header = pd.read_csv(path, nrows=0).columns.tolist()
-    for colname in TRACKS_HEADER:
-        if colname != "z" and colname not in header:
+    for colnames in TRACKS_HEADER:
+        if all(c not in header for c in colnames) and colnames[0] != "z":
             return None
 
     return reader_function
@@ -28,12 +34,15 @@ def read_csv(path: str):
     df = pd.read_csv(path)
 
     data = []
-    for colname in TRACKS_HEADER:
-        try:
-            data.append(df[colname])
-        except KeyError:
-            if colname != "z":
-                raise KeyError(f"{colname} not found in .csv header.")
+    for colnames in TRACKS_HEADER:
+        found = False
+        for c in colnames:
+            if c in df.columns:
+                data.append(df[c])
+                found = True
+                break
+        if not found and colnames[0] != "z":
+            raise KeyError(f"{colnames[0]} not found in .csv header.")
 
     data = np.stack(data).T
 

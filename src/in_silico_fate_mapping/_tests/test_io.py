@@ -25,10 +25,14 @@ def tracks(n_nodes: int = 10) -> pd.DataFrame:
     return pd.DataFrame(tracks_data, columns=["TrackID", "t", "z", "y", "x"])
 
 
-def test_get_reader(tmp_path: Path, tracks: pd.DataFrame) -> None:
+@pytest.mark.parametrize("track_id_col", ["TrackID", "track_id"])
+def test_get_reader(
+    tmp_path: Path, tracks: pd.DataFrame, track_id_col: str
+) -> None:
     path = tmp_path / "good_tracks.csv"
     tracks["NodeID"] = np.arange(len(tracks)) + 1
     tracks["Labels"] = np.random.randint(2, size=len(tracks))
+    tracks.rename(columns={"TrackID": track_id_col}, inplace=True)
     tracks.to_csv(path, index=False)
 
     reader = napari_get_reader(path)
@@ -41,7 +45,7 @@ def test_get_reader(tmp_path: Path, tracks: pd.DataFrame) -> None:
 
     assert np.allclose(props["NodeID"], tracks["NodeID"])
     assert np.allclose(props["Labels"], tracks["Labels"])
-    assert np.allclose(data, tracks[["TrackID", "t", "z", "y", "x"]])
+    assert np.allclose(data, tracks[[track_id_col, "t", "z", "y", "x"]])
 
 
 def test_napari_read(
