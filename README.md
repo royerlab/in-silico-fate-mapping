@@ -26,7 +26,7 @@ To do this, you need to:
 
 And then, you can install `in-silico-fate-mapping` via [pip] and other additional useful packages:
 
-    pip install ultrack napari-ome-zarr napari[all] in-silicio-fate-mapping
+    pip install napari-ome-zarr napari[all] in-silico-fate-mapping
 
 To install the latest development version :
 
