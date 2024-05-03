@@ -37,8 +37,8 @@ To install the latest development version :
 
 This plugin does not depend on a specific file format, the only requirement is using a `Track` layer from napari.
 
-Despite this, we ship a reader and writer interface. It supports `.csv` files with the following reader `TrackID, t, (z), y, x`, `z` is optional.
-Such that each tracklet has a unique `TrackID` and it's composed of a sequence o time and spatial coordinates.
+Despite this, we ship a reader and writer interface. It supports `.csv` files with the following reader `track_id, t, (z), y, x`, `z` is optional.
+Such that each tracklet has a unique `track_id` and it's composed of a sequence o time and spatial coordinates.
 
 This is extremely similar to how napari store tracks, more information can be found [here](https://napari.org/stable/howtos/layers/tracks.html).
 
@@ -58,7 +58,7 @@ from in_silico_fate_mapping.fate_mapping import FateMapping
 tracks = pd.read_csv("tracks.csv")
 
 fate_map = FateMapping(radius=5, n_samples=25, bind_to_existing=False, sigma=1)
-fate_map.data = tracks[["TrackID", "t", "z", "y", "x"]]
+fate_map.data = tracks[["track_id", "t", "z", "y", "x"]]
 
 source = tracks[tracks["t"] == 0].sample(n=1)
 
@@ -86,7 +86,7 @@ viewer.window.add_dock_widget(FateMappingWidget(viewer))
 viewer.open(image_path, plugin="napari-ome-zarr")
 
 tracks = pd.read_csv(tracks_path)
-viewer.add_tracks(tracks[["TrackID", "t", "z", "y", "x"]])
+viewer.add_tracks(tracks[["track_id", "t", "z", "y", "x"]])
 viewer.add_points(name="Markers", ndim=4)
 
 napari.run()
