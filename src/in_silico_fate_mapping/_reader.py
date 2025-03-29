@@ -7,7 +7,7 @@ TRACKS_HEADER = (
     ("track_id", "TrackID"),
     ("t", "T"),
     ("z", "Z"),
-    ("y", "Z"),
+    ("y", "Y"),
     ("x", "X"),
 )
 
